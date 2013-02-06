@@ -1,15 +1,32 @@
+/*
+Copyright 2013 (c) Illinois Tech Robotics <robotics.iit@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #ifndef ROBOT_H
 #define ROBOT_H
 
 #include "Arduino.h"
-
 #undef BYTE //to fix compiler errors 
 
-class Robot{
-
-public:
-	
-	enum {
+enum {
     ROBOT_EVENT_CMD           	= 0x00, // Commands  
     ROBOT_EVENT_CMD_START				= 0x01,
     ROBOT_EVENT_CMD_STOP				= 0x02,
@@ -87,15 +104,31 @@ public:
 		};
 		int type;
 	} robot_event;
+
+class Robot{
+
+public:
 	
-	Robot(HardwareSerial &serial, long baud, int timer);
+	enum{
+		ROSLUND = 0x00,
+		FENRIR  = 0x01,
+		GOLIATH = 0x02,
+		REAPER  = 0x03,
+		PENGUIN = 0x04,
+		MONGOL  = 0x05,
+		GHOST   = 0x06,
+		UNKNOWN_ROBOT = 0xFF
+	};
+	
+	Robot(HardwareSerial &serial, long baud, int timer, int robot);
 	//Robot(usb_serial_calss &serial, long baud);
 	void update();
-	void getEvent(robot_event *ev);
+	bool getEvent(robot_event *ev);
 	void sendEvent(robot_event *ev);
 
 	private:
 	const static int QUEUE_SIZE = 10;
+	const static int BUFFER_SIZE = 64;
 	typedef struct {
 		robot_event array[QUEUE_SIZE];
 		int head_index;
@@ -114,21 +147,22 @@ public:
 	const static char MESSAGE_CHECKSUM = '*';
 	
 	HardwareSerial* Comm;
-	//robot_event incomming;
 	robot_queue queue;
-	robot_event event;
+	int robot_name;
 	
 	void readSerial();
 	void timerCheck();
 	void checkHeartBeat();
 	void enqueue(robot_event *ev);
-	void dequeue(robot_event *ev);
+	bool dequeue(robot_event *ev);
 	void incTail();
 	void incHead();
 	unsigned long xtoi(const char *xs);
 	int itox(unsigned long value, char *buf);
 	
-	char buf[64];
+	char heartbeat;
+	
+	char buf[BUFFER_SIZE];
 	int length;
 	int state;
 	
@@ -153,5 +187,4 @@ public:
 	char timer100hz;
 	
 };
-
 #endif

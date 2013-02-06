@@ -1,13 +1,39 @@
-#include "robot.h"
+/*
+Copyright 2013 (c) Illinois Tech Robotics <robotics.iit@gmail.com>
 
-Robot::Robot(HardwareSerial  &serial, long baud, int timer){
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+#include "robot.h"
+Robot::Robot(HardwareSerial  &serial, long baud, int timer, int robot){
 	Comm = &serial;
 	Comm->begin(baud);
 	queue.head_index = 0;
 	queue.tail_index = 0;
 	queue.length = 0;
 	
+	heartbeat = false;
+	
+	robot_name = robot;
+	
 	length = 0;
+	state = LOOKING_FOR_HEADER;
 	
 	last_sent_P1hz = 0;
 	last_sent_1hz = 0;
@@ -32,6 +58,8 @@ Robot::Robot(HardwareSerial  &serial, long baud, int timer){
 }
 
 void Robot::readSerial(){
+	robot_event event;
+	unsigned long lTemp;
 	while(Comm->available()>0){
 		buf[length++] = Comm->read();
 		switch(state){
@@ -40,27 +68,67 @@ void Robot::readSerial(){
 				state = READING_DATA;
 			}
 			else{
+				Serial.println(buf[length-1]);
 				length = 0; //reset buffer
 			}	
 			break;
 		case READING_DATA:
+			if(buf[length-1] == MESSAGE_HEADER || length >= BUFFER_SIZE){
+				//restart because we found header
+				buf[0] = MESSAGE_HEADER;
+				length = 1;
+			}
 			if(buf[length-1] == MESSAGE_FOOTER){
-					int pos = 1;
-					int checksum = 0;
-					while(buf[pos] != MESSAGE_CHECKSUM){
-						
-						
-						
-					}	
-					char* cToken;
-					cToken = strtok(buf, ",");
-						
-						
-						
+				int pos = 1;
+				int checksum = 0;
+				while(buf[pos] != MESSAGE_CHECKSUM){
+					checksum = checksum ^ buf[pos++];
+				}
+				char* cToken;
+				cToken = strtok(buf, "U,*"); 
+				
+				event.command = (unsigned int)xtoi(cToken);
+				cToken = strtok(NULL, "U,*");
+				event.index = (unsigned char)xtoi(cToken);
+				char* value = strtok(NULL, "U,*");
+				cToken = strtok(NULL, "U,*");
+				event.type = xtoi(cToken);
+				switch(event.type){
+				case BYTE:
+					event.b = (unsigned char)xtoi(value);
+					break;
+				case INTEGER:
+					event.i = (unsigned int)xtoi(value);
+					break;
+				case LONG:
+					event.l = (unsigned long)xtoi(value);
+					break;
+				case FLOAT:
+					 lTemp= xtoi(value); //can't dereferance a return value
+					event.f = *(float *)&lTemp;
+					break;
+				case STRING:
+				//break left out
+				default:
+					strcpy(event.s, value);
+					break;
+				}
+				
+				cToken = strtok(NULL, "U,*\n"	);
+				int checksum2 = xtoi(cToken);
+				if(checksum2 == checksum){
+					if(event.command == ROBOT_EVENT_CMD_HEARTBEAT){
+						heartbeat = 0;
+					}
+					else{
+						enqueue(&event);
+					}
+				}
+				length = 0;
+				state = LOOKING_FOR_HEADER;
 			}
 			break;
 		}
-	
 	}
 }
 
@@ -107,7 +175,7 @@ void Robot::timerCheck(){
 		}
 		robot_event heartbeat;
 		heartbeat.command = ROBOT_EVENT_CMD_HEARTBEAT;
-		heartbeat.index = 0;
+		heartbeat.index = robot_name;
 		heartbeat.i = 0;
 		heartbeat.type = INTEGER;
 		sendEvent(&heartbeat);
@@ -148,8 +216,8 @@ void Robot::update(){
 	timerCheck();
 }
 
-void Robot::getEvent(robot_event *ev){
-	enqueue(ev);
+bool Robot::getEvent(robot_event *ev){
+	return dequeue(ev);
 }
 
 void Robot::sendEvent(robot_event *ev){
@@ -200,16 +268,21 @@ void Robot::enqueue(robot_event *ev){
 	head_index = queue.head_index;
 	tail_index = queue.tail_index;
 	i = head_index;
-	memcpy(&queue.array[tail_index], ev, sizeof(queue.array[tail_index]));
+	memcpy(&queue.array[tail_index], ev, sizeof(robot_event));
+	incTail();
 }
 
-void Robot::dequeue(robot_event *ev){
+bool Robot::dequeue(robot_event *ev){
 	int head_index;
 	
 	head_index = queue.head_index;
 	if(queue.length > 0){
-		memcpy(ev, &queue.array[head_index], sizeof(ev));
+		memcpy(ev, &queue.array[head_index], sizeof(robot_event));
 		incHead();
+		return true;
+	}
+	else{
+		return false;
 	}
 }
 
@@ -237,31 +310,37 @@ void Robot::incHead(){
 }
 
 void Robot::checkHeartBeat(){
-
-
+	heartbeat++;
+	if(heartbeat > 3){
+		robot_event failsafe;
+		failsafe.command = ROBOT_EVENT_CMD_FAILSAFE;
+		failsafe.index = 0;
+		failsafe.i = 0;
+		failsafe.type = INTEGER;
+		enqueue(&failsafe);
+	}
 }
 
 unsigned long Robot::xtoi(const char* xs){
-
+	
 	int len = strlen(xs);
 	unsigned long result = 0;
 
-	for(int i = len-1; i>=0; i--){
+	for(int i = 0; i<len; i++){
 		int temp = 0;
-		if(xs[i] >= 0x30 && xs[i] <= 0x39){
+		if(xs[i] >= '0' && xs[i] <= '9'){
 			temp = xs[i] - '0';
 		}
-		else if(xs[i] >= 0x41 && xs[i] <= 0x5A){
-			temp = xs[i] - 'A';
+		else if(xs[i] >= 'A' && xs[i] <= 'F'){
+			temp = xs[i] - 'A' + 10;
 		}
-		else if(xs[i] >= 0x97 && xs[i] <= 0x7A){
-			temp = xs[i] - 'a';
+		else if(xs[i] >= 'a' && xs[i] <= 'f'){
+			temp = xs[i] - 'a' + 10;
 		}
 		
 		result = result << 4;
 		result = result | (unsigned long)temp;	
 	}
-	
 	return result;
 }
 
@@ -295,6 +374,5 @@ int Robot::itox(unsigned long value, char *buf){
 	
 	return i;
 }
-
 
 
