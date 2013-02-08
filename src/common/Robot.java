@@ -20,18 +20,14 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-package robots;
-
-import common.*;
+package common;
 
 public abstract class Robot extends Thread{
 
 	Queue recv_q;
 	
-	public Robot(Queue q)
-	{
-		recv_q = q;
-		
+	public Robot(Queue q){
+		recv_q = q;	
 	}
 	
 	private volatile Boolean run = true;
@@ -44,8 +40,7 @@ public abstract class Robot extends Thread{
 	}
 	
 	public void run()
-	{
-		
+	{	
 		while(run){
 			try{
 				Event ev = recv_q.take();
@@ -141,30 +136,30 @@ public abstract class Robot extends Thread{
 		
 	}
 		
-	abstract void on_command_code(Event ev);
-	abstract void on_heartbeat(Event ev);
-	abstract void on_status(Event ev);
-	abstract void on_axis_change(Event ev);
-	abstract void on_button_down(Event ev);
-	abstract void on_button_up(Event ev);
-	abstract void on_joy_hat(Event ev);
-	abstract void on_joy_status(Event ev);
-	abstract void on_keyboard(Event ev);
-	abstract void on_display(Event ev);
-	abstract void on_1hz_timer(Event ev);
-	abstract void on_10hz_timer(Event ev);
-	abstract void on_25hz_timer(Event ev);
-	abstract void on_50hz_timer(Event ev);
-	abstract void on_100hz_timer(Event ev);
-	abstract void on_motor(Event ev);
-	abstract void on_solenoid(Event ev);
-	abstract void on_pose(Event ev);
-	abstract void on_adc(Event ev);
-	abstract void on_variable(Event ev);
-	abstract void on_imu(Event ev);
-	abstract void on_encoder(Event ev);
-	abstract void on_eeprom(Event ev);
-	abstract void on_io(Event ev);
-	abstract void on_shutdown(Event ev);
-	abstract void on_unknown_command(Event ev);
+	public abstract void on_command_code(Event ev);
+	public abstract void on_heartbeat(Event ev);
+	public abstract void on_status(Event ev);
+	public abstract void on_axis_change(Event ev);
+	public abstract void on_button_down(Event ev);
+	public abstract void on_button_up(Event ev);
+	public abstract void on_joy_hat(Event ev);
+	public abstract void on_joy_status(Event ev);
+	public abstract void on_keyboard(Event ev);
+	public abstract void on_display(Event ev);
+	public abstract void on_1hz_timer(Event ev);
+	public abstract void on_10hz_timer(Event ev);
+	public abstract void on_25hz_timer(Event ev);
+	public abstract void on_50hz_timer(Event ev);
+	public abstract void on_100hz_timer(Event ev);
+	public abstract void on_motor(Event ev);
+	public abstract void on_solenoid(Event ev);
+	public abstract void on_pose(Event ev);
+	public abstract void on_adc(Event ev);
+	public abstract void on_variable(Event ev);
+	public abstract void on_imu(Event ev);
+	public abstract void on_encoder(Event ev);
+	public abstract void on_eeprom(Event ev);
+	public abstract void on_io(Event ev);
+	public abstract void on_shutdown(Event ev);
+	public abstract void on_unknown_command(Event ev);
 }

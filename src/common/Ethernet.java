@@ -29,7 +29,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Ethernet extends Thread{
+public class Ethernet extends Communication{
 	
 	private Queue recv = null;
 	private GUI dis = null;
@@ -203,10 +203,6 @@ public class Ethernet extends Thread{
 			connect = false;
 		}
 		return connect;
-	}
-
-	public void sendStatus() {
-		sendEvent(new Event(EventEnum.ROBOT_EVENT_CMD_HEARTBEAT, (short) 0, 0));
 	}
 	
 	public synchronized void sendEvent(Event ev) {

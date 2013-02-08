@@ -24,9 +24,12 @@ package common;
 
 import java.io.*;
 import java.util.*;
+
+import common.Communication.ReadState;
+
 import gnu.io.*;
 
-public class Serial implements SerialPortEventListener{
+public class Serial extends Communication implements SerialPortEventListener {
 
 	private SerialPort serialPort = null;
 	private InputStream input = null;
@@ -130,22 +133,12 @@ public class Serial implements SerialPortEventListener{
 		}
 	}
 	
-	/**
-	 * Handle an event on the serial port. 
-	 * Read the data and parse it into a Robot_Event and add to queue
-	 */
 	private final String HEADER = "U";
 	private final String FOOTER = "\n";
 	private String sBuf = new String();
 	private byte[] buf = new byte[1];
 	private int length = 0;
 	private ReadState state = ReadState.LOOKING_FOR_HEADER;
-	
-	private enum ReadState{
-		LOOKING_FOR_HEADER,
-		READING_DATA,
-		CALCULATE_CHECKSUM;
-	}
 	
 	public synchronized void serialEvent(SerialPortEvent oEvent) {
 		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
@@ -236,13 +229,9 @@ public class Serial implements SerialPortEventListener{
 	public synchronized void sendEvent(Event ev){
 		try{
 			output.write(ev.toStringSend().getBytes());   //write needs a byte array instead of a string
-			//long milli = (long)(1.0/((float)serialPort.getBaudRate()/(8.0*16.0))*1000.0);
-			//long nano = (long)(1.0/((float)serialPort.getBaudRate()/(8.0*16.0))*1000000000.0) - milli*1000000;
-			//Thread.sleep((int)milli,(int)nano);
 		}
 		catch(Exception e){
 		}
-		
 	}
 	
 	/*

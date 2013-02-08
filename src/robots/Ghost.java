@@ -24,6 +24,7 @@ package robots;
 
 import common.Event;
 import common.Queue;
+import common.Robot;
 
 public class Ghost extends Robot{
 	
@@ -31,109 +32,108 @@ public class Ghost extends Robot{
 		super(q);
 	}
 	
-	void on_command_code(Event ev){
+	public void on_command_code(Event ev){
 		
 	}
 	
-	void on_heartbeat(Event ev) {
+	public void on_heartbeat(Event ev) {
 		
 	}
 	
-	void on_status(Event ev){
+	public void on_status(Event ev){
 		
 	}
 	
-	void on_axis_change(Event ev){
+	public void on_axis_change(Event ev){
 		
 	}
 	
-	void on_button_down(Event ev){
+	public void on_button_down(Event ev){
 		
 	}
 	
-	void on_button_up(Event ev){
+	public void on_button_up(Event ev){
 		
 	}
 	
-	void on_joy_hat(Event ev){
+	public void on_joy_hat(Event ev){
 		
 	}
 	
-	void on_joy_status(Event ev){
+	public void on_joy_status(Event ev){
 		
 	}
 	
-	void on_keyboard(Event ev) {
+	public void on_keyboard(Event ev) {
 		
 	}
 	
-	void on_display(Event ev) {
+	public void on_display(Event ev) {
 		
 	}
 	
-	void on_1hz_timer(Event ev){
+	public void on_1hz_timer(Event ev){
 		
 	}
 	
-	void on_10hz_timer(Event ev){
+	public void on_10hz_timer(Event ev){
 		
 	}
 	
-	void on_25hz_timer(Event ev){
+	public void on_25hz_timer(Event ev){
 		
 	}
 	
-	void on_50hz_timer(Event ev){
+	public void on_50hz_timer(Event ev){
 		
 	}
 	
-	void on_100hz_timer(Event ev){
+	public void on_100hz_timer(Event ev){
 		
 	}
 	
-	void on_motor(Event ev){
+	public void on_motor(Event ev){
 		
 	}
 	
-	void on_solenoid(Event ev) {
+	public void on_solenoid(Event ev) {
 		
 	}
 	
-	void on_pose(Event ev) {
+	public void on_pose(Event ev) {
 		
 	}
 	
-	void on_adc(Event ev) {
+	public void on_adc(Event ev) {
 		
 	}
 
-	void on_variable(Event ev){
+	public void on_variable(Event ev){
 		
 	}
 	
-	void on_imu(Event ev){
+	public void on_imu(Event ev){
 		
 	}
 	
-	void on_encoder(Event ev){
+	public void on_encoder(Event ev){
 		
 	}
 
-	void on_eeprom(Event ev) {
+	public void on_eeprom(Event ev) {
 		
 	}
 
-	void on_io(Event ev) {
+	public void on_io(Event ev) {
 		
 	}
 	
-	void on_shutdown(Event ev){
+	public void on_shutdown(Event ev){
 		
 	}
 	
-	void on_unknown_command(Event ev){
+	public void on_unknown_command(Event ev){
 		
 	}
-
 }
 
