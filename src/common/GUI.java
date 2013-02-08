@@ -225,11 +225,20 @@ public class GUI extends Thread{
 	  			return;
   			}
 	  		
+	  		Communication comm = null;
+	  		
+	  		if(rdbtnXbee.isSelected()){
+	  			comm = (Communication)serial;
+	  		}
+	  		else if(rdbtnWifi.isSelected()){
+	  			comm = (Communication)ethernet;
+	  		}
+	  		
 	  		if(btnTemp == btnGhostConnect){
 	  			if(btnTemp.getText().equals("Connect")){
 	  				btnTemp.setText("Disconnect");
 	  				running = true;
-	  				ghost = new Ghost(queue);
+	  				ghost = new Ghost(queue,comm);
 	  				
 	  				ghost.start();
 	  			}

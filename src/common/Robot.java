@@ -25,9 +25,11 @@ package common;
 public abstract class Robot extends Thread{
 
 	Queue recv_q;
+	Communication comm;
 	
-	public Robot(Queue q){
+	public Robot(Queue q, Communication c){
 		recv_q = q;	
+		comm = c;
 	}
 	
 	private volatile Boolean run = true;

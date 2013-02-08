@@ -22,14 +22,15 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 package robots;
 
+import common.Communication;
 import common.Event;
 import common.Queue;
 import common.Robot;
 
 public class Goliath extends Robot{
 
-	public Goliath(Queue q){
-		super(q);
+	public Goliath(Queue q, Communication c){
+		super(q,c);
 	}
 	
 	public void on_command_code(Event ev){
