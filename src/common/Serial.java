@@ -103,22 +103,26 @@ public class Serial extends Communication implements SerialPortEventListener {
 	 * returns an array of all the serial ports available 
 	 */
 	public static CommPortIdentifier[] getSerialPorts(){
-		Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
-		int i=0;
-		while(portEnum.hasMoreElements()){
-			i++;
-			portEnum.nextElement();
-		}
+		try{
+			List<CommPortIdentifier> CommPortList = new ArrayList<CommPortIdentifier>();
+			Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
+			while(portEnum.hasMoreElements()){
+				CommPortIdentifier port = (CommPortIdentifier)portEnum.nextElement();
+				CommPortList.add(port);
+			}
+			CommPortIdentifier[] Array = new CommPortIdentifier[CommPortList.size()];
+			Array = CommPortList.toArray(Array);
 		
-		CommPortIdentifier[] portId = new CommPortIdentifier[i];
-		Enumeration portEnum2 = CommPortIdentifier.getPortIdentifiers();
-		
-		i=0;
-		while (portEnum2.hasMoreElements()){
-			portId[i] = (CommPortIdentifier) portEnum2.nextElement();
-			i++;
+			for(int i = 0; i < Array.length; i++)
+			{
+				System.out.println(Array[i].getName());
+			}
+			return Array;
 		}
-		return portId;
+		catch(Exception e){
+			System.out.println(e.toString());
+		}
+		return null;
 	}
 	
 	/**
