@@ -117,9 +117,14 @@ public class GUI extends Thread{
         				int ntemp = 0;
         				for(int i=com.length-1; i>=0; i--){ //put them on in reverse order since high comm port is the more likely to be chosen
         					comboBox_SerialPort.addItem(com[i].getName());
-        					if(stemp.equals(com[i].getName())){
+        					if(stemp != null && stemp.equals(com[i].getName())){
         						ntemp = com.length - 1 - i;
         					}
+        				}
+        				if(serial.isOpen())
+        				{
+        					comboBox_SerialPort.addItem(serial.getPortName());
+        					ntemp = com.length;
         				}
         				comboBox_SerialPort.setSelectedIndex(ntemp); //select the previous selected comm port if exists
         				if(serial.isOpen()){
@@ -207,7 +212,7 @@ public class GUI extends Thread{
 	public void init()
 	{
         trSerialCommChecker = new Timer();
-        trSerialCommChecker.schedule(new deviceChecker(), 0, 1000);
+        trSerialCommChecker.schedule(new deviceChecker(), 0, 5000);
         trStanbyQueueReading = new Timer();
         trStanbyQueueReading.schedule(new StanbyQueueReading(), 0, 25);
 	}
