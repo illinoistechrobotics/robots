@@ -109,9 +109,10 @@ public class GUI extends Thread{
         			if(ethernet.isConnected() == true){
         				ethernet.stopThread();
         			}
+        			/*
         			CommPortIdentifier[] com = Serial.getSerialPorts();
         			//only change the layout if the number of ports changed and setting tab is in view
-        			if( com.length != comboBox_SerialPort.getItemCount() /*&& tabbedPane.getSelectedIndex()==0*/){
+        			if( com.length != comboBox_SerialPort.getItemCount()){
         				String stemp = (String)comboBox_SerialPort.getSelectedItem();
         				comboBox_SerialPort.removeAllItems();
         				int ntemp = 0;
@@ -133,6 +134,7 @@ public class GUI extends Thread{
         					}
         				}
         			}
+        			*/
         		}
         		else if(rdbtnWifi.isSelected()){
         			if(serial.isOpen()){

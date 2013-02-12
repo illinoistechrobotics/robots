@@ -32,6 +32,7 @@ import gnu.io.*;
 public class Serial extends Communication implements SerialPortEventListener {
 
 	private SerialPort serialPort = null;
+	private CommPortIdentifier comId = null;
 	private InputStream input = null;
 	private OutputStream output = null;
 	private Queue recv = null;
@@ -51,24 +52,24 @@ public class Serial extends Communication implements SerialPortEventListener {
 	public boolean OpenSerial(int baud, String port){
 		serialPortName = port;
 		baudRate = baud;
-		CommPortIdentifier portId = null;
+		comId = null;
 		Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
 		
 		while (portEnum.hasMoreElements()){
 			CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
 			if(currPortId.getName().equals(port)){
-				portId = currPortId;		
+				comId = currPortId;		
 				break;
 			}
 		}
 		
-		if(portId == null){
+		if(comId == null){
 			System.err.println("Can not open serial port");
 			return false;
 		}
 		
 		try{
-			serialPort = (SerialPort) portId.open(this.getClass().getName(),2000);
+			serialPort = (SerialPort) comId.open(this.getClass().getName(),2000);
 			
 			serialPort.setSerialPortParams(baud, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 		
@@ -99,25 +100,22 @@ public class Serial extends Communication implements SerialPortEventListener {
 		return baudRate;
 	}
 	
+	public CommPortIdentifier getCommPortIdentifier(){
+		return comId;
+	}
+	
 	/**
 	 * returns an array of all the serial ports available 
 	 */
-	public static CommPortIdentifier[] getSerialPorts(){
+	public static ArrayList<CommPortIdentifier> getSerialPorts(){
 		try{
-			List<CommPortIdentifier> CommPortList = new ArrayList<CommPortIdentifier>();
+			ArrayList<CommPortIdentifier> CommPortList = new ArrayList<CommPortIdentifier>();
 			Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
 			while(portEnum.hasMoreElements()){
 				CommPortIdentifier port = (CommPortIdentifier)portEnum.nextElement();
 				CommPortList.add(port);
 			}
-			CommPortIdentifier[] Array = new CommPortIdentifier[CommPortList.size()];
-			Array = CommPortList.toArray(Array);
-		
-			for(int i = 0; i < Array.length; i++)
-			{
-				System.out.println(Array[i].getName());
-			}
-			return Array;
+			return CommPortList;
 		}
 		catch(Exception e){
 			System.out.println(e.toString());

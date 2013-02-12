@@ -3,6 +3,11 @@ package test;
 import gnu.io.CommPortIdentifier;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -57,29 +62,49 @@ public class SerialTest {
 	       
         public void run(){
         	try{
-        		
-        			CommPortIdentifier[] com = Serial.getSerialPorts();
+        			/*
+        			comboBox_SerialPort.removeAllItems();
+        			if(serial.isOpen()){
+        				comboBox_SerialPort.addItem(serial.getPortName());
+        			}
+        			if(!serial.isOpen() && com[0]!=null){
+        				serial.OpenSerial(9600, com[0].getName());
+        			}
+        			for(int i=0; i<com.length; i++){
+        				comboBox_SerialPort.addItem(com[i].getName());
+        			}
+        			*/
+        			ArrayList<CommPortIdentifier> com = Serial.getSerialPorts();
+        			if(serial.isOpen() && System.getProperty("os.name").contains("nux")){
+        				com.add(serial.getCommPortIdentifier());
+        				Collections.sort(com, new Comparator<CommPortIdentifier>() {
+        				    public int compare(CommPortIdentifier a, CommPortIdentifier b) {
+        				        return a.getName().compareTo(b.getName());
+        				    }
+        				});
+        			}
         			//only change the layout if the number of ports changed and setting tab is in view
-        			if( com.length != comboBox_SerialPort.getItemCount() /*&& tabbedPane.getSelectedIndex()==0*/){
+        			if( com.size() != comboBox_SerialPort.getItemCount()){
         				String stemp = (String)comboBox_SerialPort.getSelectedItem();
         				comboBox_SerialPort.removeAllItems();
         				int ntemp = 0;
-        				for(int i=com.length-1; i>=0; i--){ //put them on in reverse order since high comm port is the more likely to be chosen
-        					comboBox_SerialPort.addItem(com[i].getName());
-        					if(stemp.equals(com[i].getName())){
-        						ntemp = com.length - 1 - i;
+        				for(int i=com.size()-1; i>=0; i--){ //put them on in reverse order since high comm port is the more likely to be chosen
+        					comboBox_SerialPort.addItem(com.get(i).getName());
+        					if(stemp != null && stemp.equals(com.get(i).getName())){
+        						ntemp = com.size() - 1 - i;
         					}
         				}
-        				comboBox_SerialPort.setSelectedIndex(ntemp); //select the previous selected comm port if exists
+        				//comboBox_SerialPort.setSelectedIndex(ntemp); //select the previous selected comm port if exists
         				if(serial.isOpen()){
         					if(serial.getPortName().equals(comboBox_SerialPort.getSelectedItem().toString()) == false){
         						serial.closeSerial();
         					}
         				}
-        			}
+        			}	
         				
         	}
         	catch(Exception e){
+        		System.out.println(e.toString());
        		}
         }
     }
@@ -110,7 +135,20 @@ public class SerialTest {
 		frame.getContentPane().setLayout(null);
 		
 		comboBox_SerialPort = new JComboBox();
-		comboBox_SerialPort.setBounds(107, 31, 88, 20);
+		comboBox_SerialPort.setBounds(107, 31, 172, 20);
+		comboBox_SerialPort.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(comboBox_SerialPort.getSelectedItem() != null){
+					if(serial.isOpen() == false){
+						serial.OpenSerial(9600,comboBox_SerialPort.getSelectedItem().toString());
+					}
+					else if(serial.getPortName().equals(((JComboBox)e.getSource()).getSelectedItem().toString()) == false){
+						serial.closeSerial();
+						serial.OpenSerial(9600,comboBox_SerialPort.getSelectedItem().toString());
+					}
+				}
+			}
+		});
 		frame.getContentPane().add(comboBox_SerialPort);
 		
 		JLabel lblSerialPort = new JLabel("Serial Port");
