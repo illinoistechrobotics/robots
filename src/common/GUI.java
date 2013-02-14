@@ -22,6 +22,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 package common;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -109,32 +112,35 @@ public class GUI extends Thread{
         			if(ethernet.isConnected() == true){
         				ethernet.stopThread();
         			}
-        			/*
-        			CommPortIdentifier[] com = Serial.getSerialPorts();
+        			
+        			ArrayList<CommPortIdentifier> com = Serial.getSerialPorts();
+        			if(serial.isOpen() && System.getProperty("os.name").contains("nux")){
+        				com.add(serial.getCommPortIdentifier());
+        				Collections.sort(com, new Comparator<CommPortIdentifier>() {
+        				    public int compare(CommPortIdentifier a, CommPortIdentifier b) {
+        				        return a.getName().compareTo(b.getName());
+        				    }
+        				});
+        			}
         			//only change the layout if the number of ports changed and setting tab is in view
-        			if( com.length != comboBox_SerialPort.getItemCount()){
+        			if( com.size() != comboBox_SerialPort.getItemCount()){
         				String stemp = (String)comboBox_SerialPort.getSelectedItem();
         				comboBox_SerialPort.removeAllItems();
         				int ntemp = 0;
-        				for(int i=com.length-1; i>=0; i--){ //put them on in reverse order since high comm port is the more likely to be chosen
-        					comboBox_SerialPort.addItem(com[i].getName());
-        					if(stemp != null && stemp.equals(com[i].getName())){
-        						ntemp = com.length - 1 - i;
+        				for(int i=com.size()-1; i>=0; i--){ //put them on in reverse order since high comm port is the more likely to be chosen
+        					comboBox_SerialPort.addItem(com.get(i).getName());
+        					if(stemp != null && stemp.equals(com.get(i).getName())){
+        						ntemp = com.size() - 1 - i;
         					}
         				}
-        				if(serial.isOpen())
-        				{
-        					comboBox_SerialPort.addItem(serial.getPortName());
-        					ntemp = com.length;
-        				}
-        				comboBox_SerialPort.setSelectedIndex(ntemp); //select the previous selected comm port if exists
+        				//comboBox_SerialPort.setSelectedIndex(ntemp); //select the previous selected comm port if exists
         				if(serial.isOpen()){
         					if(serial.getPortName().equals(comboBox_SerialPort.getSelectedItem().toString()) == false){
         						serial.closeSerial();
         					}
         				}
         			}
-        			*/
+        			
         		}
         		else if(rdbtnWifi.isSelected()){
         			if(serial.isOpen()){
