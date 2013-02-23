@@ -415,7 +415,6 @@ public class Joystick extends Thread{
 					j++;
 				}
 			}
-		
 			if(j==0){
 				Event ev = new Event(EventEnum.ROBOT_EVENT_JOY_STATUS,(short)0,0);
 				queue.put(ev);

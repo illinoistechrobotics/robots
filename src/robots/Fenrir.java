@@ -24,6 +24,7 @@ package robots;
 
 import common.Communication;
 import common.Event;
+import common.EventEnum;
 import common.Queue;
 import common.Robot;
 
@@ -38,6 +39,24 @@ public class Fenrir extends Robot{
 	}
 
 	public void on_command_code(Event ev){
+		switch(ev.getCommand()) {
+		  case ROBOT_EVENT_CMD_NOOP:
+		    comm.okStatus(); //tells that the robot is connected 
+		    break;
+		  case ROBOT_EVENT_CMD_START:
+				comm.sendEvent(new RobotEvent(EventEnum.ROBOT_EVENT_CMD_START,(short)0,0));
+		    break;
+		  case ROBOT_EVENT_CMD_STOP:
+			  comm.sendEvent(ev);
+			  comm.close();
+		    break;
+		  case ROBOT_EVENT_CMD_REBOOT:
+			  comm.sendEvent(ev);
+		    break;
+		  default:
+		    // unknown command code datagram
+		    break;
+		  }
 		
 	}
 	
@@ -50,6 +69,15 @@ public class Fenrir extends Robot{
 	}
 	
 	public void on_axis_change(Event ev){
+		//dividing by two gives full range for victors
+		if(ev.getIndex()==1){
+			int temp = (ev.getValue()-127)/4+127;
+			comm.sendEvent(new Event(EventEnum.ROBOT_EVENT_JOY_AXIS,(short)1,temp));
+		}
+		if(ev.getIndex()==2){
+			int temp = ((ev.getValue() - 127)*(-1)/8)+127;
+			comm.sendEvent(new Event(EventEnum.ROBOT_EVENT_JOY_AXIS,(short)2,temp));
+		}
 		
 	}
 	
@@ -66,7 +94,7 @@ public class Fenrir extends Robot{
 	}
 	
 	public void on_joy_status(Event ev){
-		
+		comm.sendEvent(new Event(EventEnum.ROBOT_EVENT_CMD_FAILSAFE,(short)0,0));		
 	}
 	
 	public void on_keyboard(Event ev) {

@@ -73,7 +73,9 @@ public class GUI extends Thread{
 	
 	//Ghost
 	private JToggleButton btnGhostConnect;
+	private JToggleButton btnFenrirConnect;
 	public JButton btnGhostStatus;
+	public JButton btnFenrirStatus;
 	
 	
 	private Timer trSerialCommChecker;
@@ -208,7 +210,7 @@ public class GUI extends Thread{
         			}
         		}
         		
-        		if(chckbxJoystick.isSelected()){	
+        		if(chckbxKeyboard.isSelected()){	
         			if(key == null)
         			{
         				key = new Keyboard(queue, dis);	
@@ -251,6 +253,9 @@ public class GUI extends Thread{
     				if(ev.getIndex()==6){
     					btnGhostStatus.setBackground(Color.GREEN);
     				}
+    				if(ev.getIndex()==2){
+    					btnFenrirStatus.setBackground(Color.GREEN);
+    				}
     				
     				break;
     			}
@@ -269,6 +274,7 @@ public class GUI extends Thread{
 	private boolean running = false;
 	
 	private Ghost ghost;
+	private Fenrir fenrir;
 	
 	private class btnStartListener implements ActionListener{
 	  	public void actionPerformed(ActionEvent event){
@@ -304,6 +310,25 @@ public class GUI extends Thread{
 	  		        trStanbyQueueReading.schedule(new StanbyQueueReading(), 0, 25);
 	  				btnTemp.setText("Connect");
 	  				ghost.stopThread();
+	  				running = false;
+	  			}
+	  		}
+	  		if(btnTemp == btnFenrirConnect){
+	  			if(btnTemp.getText().equals("Connect")){
+	  				trStanbyQueueReading.cancel();
+	  				btnTemp.setText("Disconnect");
+	  				
+	  				running = true;
+	  				fenrir = new Fenrir(queue,comm);
+	  				
+	  				fenrir.start();
+	  			}
+	  			else
+	  			{
+	  				trStanbyQueueReading = new Timer();
+	  		        trStanbyQueueReading.schedule(new StanbyQueueReading(), 0, 25);
+	  				btnTemp.setText("Connect");
+	  				fenrir.stopThread();
 	  				running = false;
 	  			}
 	  		}
@@ -369,6 +394,35 @@ public class GUI extends Thread{
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frmIllinoisTechRobotics.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		
+		JPanel panFenrir = new JPanel();
+		tabbedPane.addTab("Fenrir", null, panFenrir, null);
+		
+		btnFenrirConnect = new JToggleButton("Connect");
+		btnFenrirConnect.addActionListener(new btnStartListener());
+		
+		JButton btnFenrirStatus = new JButton(":)");
+		btnFenrirStatus.setBackground(Color.RED);
+		GroupLayout gl_panFenrir = new GroupLayout(panFenrir);
+		gl_panFenrir.setHorizontalGroup(
+			gl_panFenrir.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panFenrir.createSequentialGroup()
+					.addContainerGap(491, Short.MAX_VALUE)
+					.addGroup(gl_panFenrir.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnFenrirStatus)
+						.addComponent(btnFenrirConnect, Alignment.TRAILING))
+					.addContainerGap())
+		);
+		gl_panFenrir.setVerticalGroup(
+			gl_panFenrir.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panFenrir.createSequentialGroup()
+					.addGap(24)
+					.addComponent(btnFenrirConnect)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnFenrirStatus)
+					.addContainerGap(275, Short.MAX_VALUE))
+		);
+		panFenrir.setLayout(gl_panFenrir);
 		
 		JPanel panSettings = new JPanel();
 		tabbedPane.addTab("Settings", null, panSettings, null);
@@ -510,9 +564,6 @@ public class GUI extends Thread{
 					.addContainerGap(111, Short.MAX_VALUE))
 		);
 		panSettings.setLayout(gl_panSettings);
-		
-		JPanel panFenrir = new JPanel();
-		tabbedPane.addTab("Fenrir", null, panFenrir, null);
 		
 		JPanel panGhost = new JPanel();
 		tabbedPane.addTab("Ghost", null, panGhost, null);
