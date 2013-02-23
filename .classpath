@@ -4,12 +4,12 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/RXTX/RXTXcomm.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ITR_Robots/lib/RXTX"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="robots/lib/RXTX"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/JInput/jinput.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ITR_Robots/lib/JInput"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="robots/lib/JInput"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

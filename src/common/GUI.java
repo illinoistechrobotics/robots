@@ -208,7 +208,7 @@ public class GUI extends Thread{
         			}
         		}
         		
-        		if(chckbxJoystick.isSelected()){	
+        		if(chckbxKeyboard.isSelected()){	
         			if(key == null)
         			{
         				key = new Keyboard(queue, dis);	
