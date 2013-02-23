@@ -110,14 +110,14 @@ class Robot{
 public:
 	
 	enum{
-		ROSLUND = 0x00,
-		FENRIR  = 0x01,
-		GOLIATH = 0x02,
-		REAPER  = 0x03,
-		PENGUIN = 0x04,
-		MONGOL  = 0x05,
+		ROSLUND = 0x01,
+		FENRIR  = 0x02,
+		GOLIATH = 0x03,
+		REAPER  = 0x04,
+		PENGUIN = 0x05,
 		GHOST   = 0x06,
-		UNKNOWN_ROBOT = 0xFF
+		MONGOL  = 0x07,
+		UNKNOWN_ROBOT = 0x00
 	};
 	
 	Robot(HardwareSerial &serial, long baud, int timer, int robot);

@@ -22,17 +22,24 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 package common;
 
+import common.Timer.TimerEnum;
+
 public abstract class Robot extends Thread{
 
-	Queue recv_q;
-	Communication comm;
+	protected Queue recv_q;
+	protected Communication comm;
+	protected Timer timer;
 	
 	public Robot(Queue q, Communication c){
 		recv_q = q;	
 		comm = c;
+		timer = new Timer(recv_q);
+		timer.timer10hz = true;
+		timer.start();
 	}
 	
 	private volatile Boolean run = true;
+	int heartbeatcount = 0;
 	
 	public void stopThread(){
 		if(run != false){
@@ -55,10 +62,13 @@ public abstract class Robot extends Thread{
 					//break left out
 				case ROBOT_EVENT_CMD_REBOOT:
 					//break left out
-				case ROBOT_EVENT_CMD_FAILSAFE:
 					on_command_code(ev);
 					break;
+				case ROBOT_EVENT_CMD_FAILSAFE:
+					on_failsafe(ev);
+					break;
 				case ROBOT_EVENT_CMD_HEARTBEAT:
+					reset_heartbeat();
 					on_heartbeat(ev);
 					break;
 				case ROBOT_EVENT_STATUS:
@@ -82,20 +92,30 @@ public abstract class Robot extends Thread{
 				case ROBOT_EVENT_KEYBOARD:
 					on_keyboard(ev);
 					break;
+				case ROBOT_EVENT_KEYBOARD_STATUS:
+					on_key_status(ev);
+					break;
 				case ROBOT_EVENT_DISPLAY:
 					on_display(ev);
 					break;
 				case ROBOT_EVENT_TIMER:
-					if(ev.getIndex() == 1)
+					if(ev.getIndex() == TimerEnum.TIMER_1HZ.value){
 						on_1hz_timer(ev);
-					else if(ev.getIndex() == 2)
-						on_10hz_timer(ev);
-					else if (ev.getIndex() == 3)
+					}
+					else if(ev.getIndex() == TimerEnum.TIMER_10HZ.value){
+						send_heartbeat();
+						check_heartbeat();
+						on_10hz_timer(ev);	
+					}
+					else if (ev.getIndex() == TimerEnum.TIMER_25HZ.value){
 						on_25hz_timer(ev);
-					else if (ev.getIndex() == 4)
+					}
+					else if (ev.getIndex() == TimerEnum.TIMER_50HZ.value){
 						on_50hz_timer(ev);
-					else if (ev.getIndex() == 5)
+					}
+					else if (ev.getIndex() == TimerEnum.TIMER_100HZ.value){
 						on_100hz_timer(ev);
+					}
 					break;	
 				case ROBOT_EVENT_MOTOR:
 					on_motor(ev);
@@ -137,31 +157,48 @@ public abstract class Robot extends Thread{
 		}
 		
 	}
-		
-	public abstract void on_command_code(Event ev);
-	public abstract void on_heartbeat(Event ev);
-	public abstract void on_status(Event ev);
-	public abstract void on_axis_change(Event ev);
-	public abstract void on_button_down(Event ev);
-	public abstract void on_button_up(Event ev);
-	public abstract void on_joy_hat(Event ev);
-	public abstract void on_joy_status(Event ev);
-	public abstract void on_keyboard(Event ev);
-	public abstract void on_display(Event ev);
-	public abstract void on_1hz_timer(Event ev);
-	public abstract void on_10hz_timer(Event ev);
-	public abstract void on_25hz_timer(Event ev);
-	public abstract void on_50hz_timer(Event ev);
-	public abstract void on_100hz_timer(Event ev);
-	public abstract void on_motor(Event ev);
-	public abstract void on_solenoid(Event ev);
-	public abstract void on_pose(Event ev);
-	public abstract void on_adc(Event ev);
-	public abstract void on_variable(Event ev);
-	public abstract void on_imu(Event ev);
-	public abstract void on_encoder(Event ev);
-	public abstract void on_eeprom(Event ev);
-	public abstract void on_io(Event ev);
-	public abstract void on_shutdown(Event ev);
-	public abstract void on_unknown_command(Event ev);
+	
+	public void send_heartbeat(){
+		comm.sendEvent(new Event(EventEnum.ROBOT_EVENT_CMD_HEARTBEAT,(short)6,(int)0xFF));
+	}
+	
+	public void check_heartbeat(){
+		heartbeatcount++;
+		if(heartbeatcount>10){ //one second
+			on_failsafe(new Event(EventEnum.ROBOT_EVENT_CMD_FAILSAFE,(short)0,(int)0));
+		}
+	}
+	
+	public void reset_heartbeat(){
+		heartbeatcount=0;
+	}
+	
+	protected abstract void on_failsafe(Event ev);
+	protected abstract void on_command_code(Event ev);
+	protected abstract void on_heartbeat(Event ev);
+	protected abstract void on_status(Event ev);
+	protected abstract void on_axis_change(Event ev);
+	protected abstract void on_button_down(Event ev);
+	protected abstract void on_button_up(Event ev);
+	protected abstract void on_joy_hat(Event ev);
+	protected abstract void on_joy_status(Event ev);
+	protected abstract void on_keyboard(Event ev);
+	protected abstract void on_key_status(Event ev);
+	protected abstract void on_display(Event ev);
+	protected abstract void on_1hz_timer(Event ev);
+	protected abstract void on_10hz_timer(Event ev);
+	protected abstract void on_25hz_timer(Event ev);
+	protected abstract void on_50hz_timer(Event ev);
+	protected abstract void on_100hz_timer(Event ev);
+	protected abstract void on_motor(Event ev);
+	protected abstract void on_solenoid(Event ev);
+	protected abstract void on_pose(Event ev);
+	protected abstract void on_adc(Event ev);
+	protected abstract void on_variable(Event ev);
+	protected abstract void on_imu(Event ev);
+	protected abstract void on_encoder(Event ev);
+	protected abstract void on_eeprom(Event ev);
+	protected abstract void on_io(Event ev);
+	protected abstract void on_shutdown(Event ev);
+	protected abstract void on_unknown_command(Event ev);
 }

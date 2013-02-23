@@ -68,16 +68,21 @@ public class GUI extends Thread{
 	private JSlider sldX2;
 	private JSlider sldY1;
 	private JSlider sldY2;
+	private JCheckBox chckbxKeyboard;
+	private JCheckBox chckbxJoystick;
 	
 	//Ghost
 	private JToggleButton btnGhostConnect;
+	public JButton btnGhostStatus;
+	
 	
 	private Timer trSerialCommChecker;
 	private Timer trStanbyQueueReading;
 	private Queue queue = new Queue(1000);
-	private Serial serial = new Serial(queue, this);
-	private Ethernet ethernet = new Ethernet(queue, this);
+	private Serial serial = new Serial(queue);
+	private Ethernet ethernet = new Ethernet(queue);
 	private Joystick joy;
+	private Keyboard key;
 	private GUI dis = this;
 	
 	/**
@@ -175,42 +180,78 @@ public class GUI extends Thread{
         		}
 		
         		//if joy null check for joystick
-        		if(joy == null)
-        		{
-        			Controller con = Joystick.getJoystick();
-        			//if joystick found use it
-        			if( con != null )
+        		if(chckbxJoystick.isSelected()){
+        			if(joy == null)
         			{
-        				joy = new Joystick(queue, con, dis);	
-        				joy.start();
+        				Controller con = Joystick.getJoystick();
+        				//if joystick found use it
+        				if( con != null )
+        				{
+        					joy = new Joystick(queue, con, dis);	
+        					joy.start();
         				
+        				}
+        			}
+        			else //joystick exits check to see if connected
+        			{
+        				if( joy.checkJoystick() == false )
+        				{
+        					//joystick disconnected stop joy and start searching again 
+        					joy.stopThread();
+        					joy = null;
+        				}
         			}
         		}
-        		else //joystick exits check to see if connected
-        		{
-        			if( joy.checkJoystick() == false )
-        			{
-        				//joystick disconnected stop joy and start searching again 
+        		else{
+        			if(joy != null){
         				joy.stopThread();
-        				joy = null;
         			}
-        		}          			
+        		}
+        		
+        		if(chckbxJoystick.isSelected()){	
+        			if(key == null)
+        			{
+        				key = new Keyboard(queue, dis);	
+        				key.start();
+        			}
+        			else //keyboard exits check to see if connected
+        			{
+        				if( key.checkKeyboard() == false )
+        				{
+        					//keyboard disconnected stop joy and start searching again 
+        					key.stopThread();
+        					key = null;
+        				}
+        			}
+        		}
+        		else{
+        			if(key != null){
+        				key.stopThread();
+        			}
+        		}
+        		
+        		
+        		
         	}
         	catch(Exception e){
        		}
         }
     }
-
+	
 	public class StanbyQueueReading extends TimerTask{
-	       
+		
         public void run(){
         	//remove queue items and dispose of them needed to display joystick values
-    		while(queue.getSize() > 0)
+        	while(queue.getSize() > 0)
     		{
     			Event ev = queue.poll();
     			switch(ev.getCommand()){
+    			//check the heartbeat and update connection status
     			case ROBOT_EVENT_CMD_HEARTBEAT:
-    				//check the heartbeat and update connection status
+    				if(ev.getIndex()==6){
+    					btnGhostStatus.setBackground(Color.GREEN);
+    				}
+    				
     				break;
     			}
     		}
@@ -220,7 +261,7 @@ public class GUI extends Thread{
 	public void init()
 	{
         trSerialCommChecker = new Timer();
-        trSerialCommChecker.schedule(new deviceChecker(), 0, 5000);
+        trSerialCommChecker.schedule(new deviceChecker(), 0, 1000);
         trStanbyQueueReading = new Timer();
         trStanbyQueueReading.schedule(new StanbyQueueReading(), 0, 25);
 	}
@@ -249,7 +290,9 @@ public class GUI extends Thread{
 	  		
 	  		if(btnTemp == btnGhostConnect){
 	  			if(btnTemp.getText().equals("Connect")){
+	  				trStanbyQueueReading.cancel();
 	  				btnTemp.setText("Disconnect");
+	  				
 	  				running = true;
 	  				ghost = new Ghost(queue,comm);
 	  				
@@ -257,6 +300,8 @@ public class GUI extends Thread{
 	  			}
 	  			else
 	  			{
+	  				trStanbyQueueReading = new Timer();
+	  		        trStanbyQueueReading.schedule(new StanbyQueueReading(), 0, 25);
 	  				btnTemp.setText("Connect");
 	  				ghost.stopThread();
 	  				running = false;
@@ -393,10 +438,10 @@ public class GUI extends Thread{
 		
 		JLabel lblInputDevice = new JLabel("Input Device");
 		
-		JCheckBox chckbxJoystick = new JCheckBox("JoyStick");
+		chckbxJoystick = new JCheckBox("JoyStick");
 		chckbxJoystick.setSelected(true);
 		
-		JCheckBox chckbxKeyboard = new JCheckBox("Keyboard");
+		chckbxKeyboard = new JCheckBox("Keyboard");
 		GroupLayout gl_panSettings = new GroupLayout(panSettings);
 		gl_panSettings.setHorizontalGroup(
 			gl_panSettings.createParallelGroup(Alignment.LEADING)
@@ -472,9 +517,9 @@ public class GUI extends Thread{
 		JPanel panGhost = new JPanel();
 		tabbedPane.addTab("Ghost", null, panGhost, null);
 		
-		JButton btnStatus = new JButton("");
-		btnStatus.setBounds(527, 12, 50, 35);
-		btnStatus.setBackground(Color.RED);
+		btnGhostStatus = new JButton("");
+		btnGhostStatus.setBounds(527, 12, 50, 35);
+		btnGhostStatus.setBackground(Color.RED);
 		
 		JSlider sldLeftMotor = new JSlider();
 		sldLeftMotor.setBounds(23, 53, 16, 200);
@@ -514,7 +559,7 @@ public class GUI extends Thread{
 		panGhost.add(lblRight);
 		panGhost.add(sldRightMotor);
 		panGhost.add(btnGhostConnect);
-		panGhost.add(btnStatus);
+		panGhost.add(btnGhostStatus);
 		
 		JPanel panGoliath = new JPanel();
 		tabbedPane.addTab("Goliath", null, panGoliath, null);

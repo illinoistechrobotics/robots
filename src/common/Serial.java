@@ -33,17 +33,13 @@ public class Serial extends Communication implements SerialPortEventListener {
 
 	private SerialPort serialPort = null;
 	private CommPortIdentifier comId = null;
-	private InputStream input = null;
-	private OutputStream output = null;
-	private Queue recv = null;
-	private GUI dis = null;
+	
 	private boolean isOpen = false;
 	private String serialPortName;
 	private int baudRate = 0;
 	
-	public Serial(Queue r, GUI d){
+	public Serial(Queue r){
 		this.recv = r;
-		this.dis = d;
 	}
 	
 	/**
@@ -135,106 +131,14 @@ public class Serial extends Communication implements SerialPortEventListener {
 		}
 	}
 	
-	private final String HEADER = "U";
-	private final String FOOTER = "\n";
-	private String sBuf = new String();
-	private byte[] buf = new byte[1];
-	private int length = 0;
-	private ReadState state = ReadState.LOOKING_FOR_HEADER;
 	
 	public synchronized void serialEvent(SerialPortEvent oEvent) {
 		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-			try {
-				while((length = input.read(buf,0,1))>0){
-					sBuf.concat(new String(buf, 0, length));
-					switch(state){
-					case LOOKING_FOR_HEADER:
-						if(sBuf.contains(HEADER)){
-							sBuf = sBuf.substring(sBuf.indexOf(HEADER)); //remove data in front of header
-							state = ReadState.READING_DATA;
-						}
-						else{
-							sBuf = ""; //remove everything since no valid data
-						}
-						break;
-					case READING_DATA:
-						if(sBuf.contains(FOOTER)){
-							state = ReadState.CALCULATE_CHECKSUM;
-						}
-						else if(sBuf.indexOf(HEADER,1)>-1)
-						{
-							//new header "start over"
-							sBuf = sBuf.substring(sBuf.indexOf(HEADER,1));
-						}
-						break;
-					case CALCULATE_CHECKSUM:
-
-						Event ev = new Event();
-						String fullMessage = sBuf.substring(0, sBuf.indexOf(FOOTER));
-						String checksumMessage = fullMessage.substring(1, fullMessage.indexOf("*"));
-						sBuf = sBuf.substring(sBuf.indexOf(FOOTER));
-						int checksum = 0;
-						for(int i = 2; i < checksumMessage.length(); i++) //checksum not include the start byte
-						{
-							checksum = checksum^(((int)checksumMessage.charAt(i))&0xFF);
-						}
-
-
-						String[] token = fullMessage.split(",*");
-
-						if(Integer.parseInt(token[5],16) == checksum )
-						{
-							ev.setCommand(EventEnum.getEvent(Integer.parseInt(token[1],16))); //command
-							ev.setIndex((short)Integer.parseInt(token[2],16)); //index
-							//ev.setSValue(token[3]);	//set string always since unknown length
-							Event.ValueType type = Event.ValueType.getType(Integer.parseInt(token[4]));
-							switch(type){
-							case BYTE:
-								ev.setBValue((short)Integer.parseInt(token[3],16));
-								break;
-							case INTEGER:
-								ev.setValue(Integer.parseInt(token[3],16));
-								break;
-							case LONG:
-								ev.setLValue(Long.parseLong(token[3],16));
-								break;
-							case FLOAT:
-								ev.setFValue(Float.intBitsToFloat((int)Long.parseLong(token[3],16))); //since float and long same amount of bits need to set both
-								break;
-							case STRING:
-								ev.setSValue(token[3]);
-								break;
-							default:
-								ev.setSValue(token[3]);
-								break;
-							}
-
-							try{
-								recv.put(ev);
-							}
-							catch(Exception e){
-							}
-						}
-
-
-						state = ReadState.LOOKING_FOR_HEADER;
-						break;
-					}
-				}
-			}
-			catch(Exception e){
-			}
+			parseData();
 		}
 	}
 	
 	
-	public synchronized void sendEvent(Event ev){
-		try{
-			output.write(ev.toStringSend().getBytes());   //write needs a byte array instead of a string
-		}
-		catch(Exception e){
-		}
-	}
 	
 	/*
 	public void sendHeartBeat(){

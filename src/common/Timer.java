@@ -27,15 +27,15 @@ import java.util.*;
 public class Timer extends Thread{
 	private Queue queue = null;
 	private volatile Boolean run = true;
-	public Boolean timerP1hz = false;
-	public Boolean timer1hz = false;
-	public Boolean timer2hz = false;
-	public Boolean timer5hz = false;
-	public Boolean timer10hz = false;
-	public Boolean timer20hz = false;
-	public Boolean timer25hz = false;
-	public Boolean timer50hz = false;
-	public Boolean timer100hz = false;
+	public volatile Boolean timerP1hz = false;
+	public volatile Boolean timer1hz = false;
+	public volatile Boolean timer2hz = false;
+	public volatile Boolean timer5hz = false;
+	public volatile Boolean timer10hz = false;
+	public volatile Boolean timer20hz = false;
+	public volatile Boolean timer25hz = false;
+	public volatile Boolean timer50hz = false;
+	public volatile Boolean timer100hz = false;
 	
 	public enum TimerEnum{
 		TIMER_P1HZ 		((short)0x00),
@@ -80,9 +80,10 @@ public class Timer extends Thread{
 	    long  last_sent_100hz = 0;
 	    long  last_sent_heartbeat = 0;
 		
-		Date time = new Date();
+		
 		
 		while(run){
+			Date time = new Date();
 			try{
 				if(timerP1hz == true){
 					if((time.getTime()-last_sent_P1hz) > 10000){
@@ -109,6 +110,7 @@ public class Timer extends Thread{
 					}
 				}
 				if(timer10hz == true){
+					//long tempt = time.getTime();
 					if((time.getTime()-last_sent_10hz) > 100){
 						last_sent_10hz = time.getTime();
 						queue.put(new Event(EventEnum.ROBOT_EVENT_TIMER,TimerEnum.TIMER_10HZ.value,0));

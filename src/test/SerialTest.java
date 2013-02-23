@@ -30,7 +30,7 @@ public class SerialTest {
 	private JFrame frame;
 	JComboBox comboBox_SerialPort;
 	private Queue queue = new Queue(1000);
-	private Serial serial = new Serial(queue, new GUI());
+	private Serial serial = new Serial(queue);
 	private Timer trSerialCommChecker;
 	private Timer trStanbyQueueReading;
 	

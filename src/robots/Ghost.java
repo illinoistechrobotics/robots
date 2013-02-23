@@ -26,11 +26,17 @@ import common.Communication;
 import common.Event;
 import common.Queue;
 import common.Robot;
+import common.Timer;
 
 public class Ghost extends Robot{
 	
 	public Ghost(Queue q, Communication c){
 		super(q,c);
+		
+	}
+	
+	public void on_failsafe(Event ev){
+		
 	}
 	
 	public void on_command_code(Event ev){
@@ -46,6 +52,7 @@ public class Ghost extends Robot{
 	}
 	
 	public void on_axis_change(Event ev){
+		//tank drive
 		
 	}
 	
@@ -66,6 +73,10 @@ public class Ghost extends Robot{
 	}
 	
 	public void on_keyboard(Event ev) {
+		
+	}
+	
+	public void on_key_status(Event ev){
 		
 	}
 	

@@ -41,6 +41,7 @@ public enum EventEnum {
     ROBOT_EVENT_JOY_STATUS			(0x23), // Joystick status
     
     ROBOT_EVENT_KEYBOARD			(0x30), // Keyboard Events
+    ROBOT_EVENT_KEYBOARD_STATUS		(0x31), // Keyboard status
     
     ROBOT_EVENT_DISPLAY				(0x40), // Display info events
     ROBOT_EVENT_TIMER               (0x50), // Timer events

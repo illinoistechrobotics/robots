@@ -61,7 +61,7 @@ public class Keyboard extends Thread{
 					}
 				}
 				//*/
-				break;
+				//break;
 			}
 			//System.out.println(cs[i].getType().toString());
 		}
@@ -77,7 +77,7 @@ public class Keyboard extends Thread{
 	public void run(){
 		Event ev = new Event();
 		run = true;
-		//clear any joystick events in the queue
+		//clear any keyboard events in the queue
 		EventQueue event_q = keyboard.getEventQueue();
 		net.java.games.input.Event key_event = new net.java.games.input.Event();
 		while(event_q.getNextEvent(key_event)){
@@ -122,6 +122,29 @@ public class Keyboard extends Thread{
 			}
 			
 		}
+	}
+	
+	boolean checkKeyboard(){	
+		if(System.getProperty("os.name").toLowerCase().contains("win")){
+			DirectInputEnvironmentPlugin diep = new DirectInputEnvironmentPlugin();
+			Controller[] cs = diep.getControllers();
+			int j=0;
+			for(int i=0; i<cs.length; i++){
+				//this will only output the controllers
+				if(cs[i].getType() == Controller.Type.KEYBOARD){
+					j++;
+				}
+			}
+		
+			if(j==0){
+				Event ev = new Event(EventEnum.ROBOT_EVENT_KEYBOARD_STATUS,(short)0,0);
+				queue.put(ev);
+				this.stopThread();
+				return false;
+			}
+			return true;
+		}
+		return true;
 	}
 	
 	
