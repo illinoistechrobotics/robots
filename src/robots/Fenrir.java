@@ -39,24 +39,6 @@ public class Fenrir extends Robot{
 	}
 
 	public void on_command_code(Event ev){
-		switch(ev.getCommand()) {
-		  case ROBOT_EVENT_CMD_NOOP:
-		    comm.okStatus(); //tells that the robot is connected 
-		    break;
-		  case ROBOT_EVENT_CMD_START:
-				comm.sendEvent(new RobotEvent(EventEnum.ROBOT_EVENT_CMD_START,(short)0,0));
-		    break;
-		  case ROBOT_EVENT_CMD_STOP:
-			  comm.sendEvent(ev);
-			  comm.close();
-		    break;
-		  case ROBOT_EVENT_CMD_REBOOT:
-			  comm.sendEvent(ev);
-		    break;
-		  default:
-		    // unknown command code datagram
-		    break;
-		  }
 		
 	}
 	
