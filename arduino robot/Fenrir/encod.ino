@@ -117,8 +117,8 @@ void zero_encod(struct encoder * encod){
 }
 int velocity(struct encoder * encod){
   int velocity = encod->count/(millis()-encod->time);
-  encod->time=millis();
   zero_encod(encod);
+  encod->time=millis();
   return velocity;
 }
 

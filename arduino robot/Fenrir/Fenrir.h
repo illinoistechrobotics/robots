@@ -21,8 +21,8 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#define MOTOR_RIGHT 0
-#define MOTOR_LEFT  1
+#define MOTOR_RIGHT 10
+#define MOTOR_LEFT  9
 
 #define MOTOR_RIGHT_PIN_A 3
 #define MOTOR_RIGHT_PIN_B 9
@@ -39,6 +39,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define CELL_8 A7
 
 #define CURRENT A8
+#define CURRENT_VOE 521
 
 #define SHUTOFF_A 43
 #define SHUTOFF_B 42
@@ -49,6 +50,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define ENCOD1_PINB 13
 #define ENCOD2_PINA A14
 #define ENCOD2_PINB A15
+
+double readVolts(int cell);
+double readVolts_norm(int cell);
+double readCurrent();
+double readPower();
     
                       //3v, 4v
 int volt_table[8][2]={{631,837},//Cell 1

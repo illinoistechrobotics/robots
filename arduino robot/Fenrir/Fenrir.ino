@@ -27,14 +27,18 @@ Copyright 2013 (c) Illinois Tech Robotics <robotics.iit@gmail.com>
 #define COMM Serial
 #define BAUDRATE 57600
 
-Robot robot = Robot((HardwareSerial&)COMM, BAUDRATE, TIMER_25HZ_MASK | TIMER_100HZ_MASK, Robot::GHOST);
+Robot robot = Robot((HardwareSerial&)COMM, BAUDRATE, TIMER_1HZ_MASK , Robot::FENRIR);
 //The third argument sets the timers as a mask. These timers can not be changed at run time!!! 
 
 void setup() {
+    Serial.begin(BAUDRATE);
+    //Serial.print("TEST_TOP\n");
   initialize();
+  //encoder_setup();
 }
 
 void loop() {
+  //Serial.print("TEST\n");
   robot_event ev;
   robot.update();
   if(robot.getEvent(&ev) == true){ 

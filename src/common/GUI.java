@@ -49,6 +49,7 @@ import gnu.io.*;
 import net.java.games.input.Controller;
 
 import robots.*;
+import java.awt.Font;
 
 
 public class GUI extends Thread{
@@ -76,7 +77,10 @@ public class GUI extends Thread{
 	private JToggleButton btnFenrirConnect;
 	public JButton btnGhostStatus;
 	public JButton btnFenrirStatus;
-	
+	public Float[][] cells= new Float[2][9];
+	public Integer[] cellnames= {1,2,3,4,5,6,7,8};
+	public JProgressBar battery1;
+	public JProgressBar battery2;
 	
 	private Timer trSerialCommChecker;
 	private Timer trStanbyQueueReading;
@@ -275,6 +279,7 @@ public class GUI extends Thread{
 	
 	private Ghost ghost;
 	private Fenrir fenrir;
+	private JTable table;
 	
 	private class btnStartListener implements ActionListener{
 	  	public void actionPerformed(ActionEvent event){
@@ -403,11 +408,36 @@ public class GUI extends Thread{
 		
 		JButton btnFenrirStatus = new JButton(":)");
 		btnFenrirStatus.setBackground(Color.RED);
+		
+		table = new JTable(cells,cellnames);
+		
+		battery1 = new JProgressBar();
+		battery1.setStringPainted(true);
+		battery1.setValue(72);
+		battery1.setBackground(Color.RED);
+		battery1.setForeground(Color.GREEN);
+		
+		battery2 = new JProgressBar();
+		battery2.setValue(72);
+		battery2.setStringPainted(true);
+		battery2.setFont(new Font("Dialog", Font.BOLD, 12));
+		battery2.setForeground(Color.GREEN);
+		battery2.setBackground(Color.RED);
+		
 		GroupLayout gl_panFenrir = new GroupLayout(panFenrir);
 		gl_panFenrir.setHorizontalGroup(
 			gl_panFenrir.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panFenrir.createSequentialGroup()
-					.addContainerGap(491, Short.MAX_VALUE)
+					.addGroup(gl_panFenrir.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panFenrir.createSequentialGroup()
+							.addGap(172)
+							.addComponent(table, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panFenrir.createSequentialGroup()
+							.addGap(55)
+							.addGroup(gl_panFenrir.createParallelGroup(Alignment.LEADING)
+								.addComponent(battery2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(battery1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+					.addPreferredGap(ComponentPlacement.RELATED, 278, Short.MAX_VALUE)
 					.addGroup(gl_panFenrir.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnFenrirStatus)
 						.addComponent(btnFenrirConnect, Alignment.TRAILING))
@@ -417,9 +447,16 @@ public class GUI extends Thread{
 			gl_panFenrir.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panFenrir.createSequentialGroup()
 					.addGap(24)
-					.addComponent(btnFenrirConnect)
+					.addGroup(gl_panFenrir.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panFenrir.createSequentialGroup()
+							.addComponent(battery1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(table, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnFenrirConnect))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnFenrirStatus)
+					.addGroup(gl_panFenrir.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnFenrirStatus)
+						.addComponent(battery2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(275, Short.MAX_VALUE))
 		);
 		panFenrir.setLayout(gl_panFenrir);
