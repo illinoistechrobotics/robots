@@ -31,7 +31,6 @@ import common.Robot;
 
 public class Fenrir extends Robot{
 	static int count;
-
 	public Fenrir(Queue q, Communication c){
 		super(q,c);
 	}
@@ -137,7 +136,6 @@ public class Fenrir extends Robot{
 			GUI.setBar(2,(int)ev.getFValue()*100);
 		}
 		System.out.println(ev.getFValue()+" "+count++);
-		
 	}
 	
 	public void on_imu(Event ev){

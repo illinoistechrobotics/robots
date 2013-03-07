@@ -120,6 +120,9 @@ void on_1hz_timer(robot_event *ev){
   event.index=8;
   event.f=readVolts(CELL_5);
   robot.sendEvent(&event);
+  event.index=0;
+  event.f = readCurrent();
+  robot.sendEvent(&event);
 }
 
 void on_2hz_timer(robot_event *ev){
