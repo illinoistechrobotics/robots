@@ -79,8 +79,8 @@ public class GUI extends Thread{
 	public JButton btnFenrirStatus;
 	public Float[][] cells= new Float[2][9];
 	public Integer[] cellnames= {1,2,3,4,5,6,7,8};
-	public JProgressBar battery1;
-	public JProgressBar battery2;
+	public static JProgressBar battery1;
+	public static JProgressBar battery2;
 	
 	private Timer trSerialCommChecker;
 	private Timer trStanbyQueueReading;
@@ -281,6 +281,15 @@ public class GUI extends Thread{
 	private Fenrir fenrir;
 	private JTable table;
 	
+	public static void setBar(int bar,int value){
+		if(bar==1){
+			battery1.setValue(value);
+		}
+		if(bar==2){
+			battery2.setValue(value);
+		}
+	}
+	
 	private class btnStartListener implements ActionListener{
 	  	public void actionPerformed(ActionEvent event){
 	  		JToggleButton btnTemp = (JToggleButton)event.getSource();
@@ -412,12 +421,14 @@ public class GUI extends Thread{
 		table = new JTable(cells,cellnames);
 		
 		battery1 = new JProgressBar();
+		battery1.setMaximum(1680);
 		battery1.setStringPainted(true);
 		battery1.setValue(72);
 		battery1.setBackground(Color.RED);
 		battery1.setForeground(Color.GREEN);
 		
 		battery2 = new JProgressBar();
+		battery2.setMaximum(1680);
 		battery2.setValue(72);
 		battery2.setStringPainted(true);
 		battery2.setFont(new Font("Dialog", Font.BOLD, 12));

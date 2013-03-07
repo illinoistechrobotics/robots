@@ -25,6 +25,7 @@ package robots;
 import common.Communication;
 import common.Event;
 import common.EventEnum;
+import common.GUI;
 import common.Queue;
 import common.Robot;
 
@@ -128,6 +129,12 @@ public class Fenrir extends Robot{
 	}
 
 	public void on_variable(Event ev){
+		if(ev.getIndex()==4){
+			GUI.setBar(1,(int)ev.getFValue()*100);
+		}
+		if(ev.getIndex()==8){
+			GUI.setBar(2,(int)ev.getFValue()*100);
+		}
 		
 	}
 	
