@@ -82,11 +82,13 @@ public class Ethernet extends Communication{
 				return;
 			}
 			parseData();
+			
 			try {
 				Thread.sleep(0,100);
 			} 
 			catch (InterruptedException ie) {
 			}
+			
 		}
 	}
 

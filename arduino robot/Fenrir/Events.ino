@@ -115,11 +115,24 @@ void on_1hz_timer(robot_event *ev){
   event.index=4;
   event.type = FLOAT;
   event.command = ROBOT_EVENT_VARIABLE;
+  /*
   event.f = readVolts(CELL_4);
   robot.sendEvent(&event);
+  //Serial.println(event.f);
   event.index=8;
   event.f=readVolts(CELL_8);
   robot.sendEvent(&event);
+  //Serial.println(event.f);
+  event.index=0;
+  event.f = readCurrent();
+  robot.sendEvent(&event);
+  //Serial.println(event.f);
+  */
+  for(int i = 54; i<54+8;++i){
+    event.f=readVolts(i);
+    robot.sendEvent(&event);
+  }
+
 }
 
 void on_2hz_timer(robot_event *ev){

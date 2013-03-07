@@ -61,7 +61,7 @@ public class Queue {
 	
 	public synchronized boolean add(Event da){
 		if(size >= max_size){
-			return false;
+			//return false;
 		}
 		Event newda = da.copy();
 		Node temp = new Node(newda);
@@ -127,7 +127,7 @@ public class Queue {
 			temp = this.poll();
 			if(temp == null){
 				try{
-					Thread.sleep(5);
+					Thread.sleep(10);
 				}
 				catch(Exception e){
 					return null;
@@ -146,6 +146,7 @@ public class Queue {
 		else{
 			Event tmp = null;
 			tmp = first.data;
+			first.data=null;
 			first = first.next;
 			size --;
 			if(first == null){
