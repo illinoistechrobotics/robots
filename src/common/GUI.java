@@ -258,6 +258,9 @@ public class GUI extends Thread{
     					btnGhostStatus.setBackground(Color.GREEN);
     				}
     				if(ev.getIndex()==2){
+    					if(btnFenrirStatus==null){
+    						btnFenrirStatus= new JButton(":)");
+    					}
     					btnFenrirStatus.setBackground(Color.GREEN);
     				}
     				

@@ -68,8 +68,8 @@ void on_axis_change(robot_event *ev){
   r_vel=tempR;
   l_vel=tempL;
 
-  //analogWrite(10, map(tempL,0,255,MIN_MOTOR_SPEED,MAX_MOTOR_SPEED));
-  //analogWrite(3,map(tempR,0,255,MIN_MOTOR_SPEED,MAX_MOTOR_SPEED));
+  //analogWrite(MOTOR_LEFT, map(tempL,0,255,MIN_MOTOR_SPEED,MAX_MOTOR_SPEED));
+  //analogWrite(MOTOR_RIGHT,map(tempR,0,255,MIN_MOTOR_SPEED,MAX_MOTOR_SPEED));
 
 }
 
@@ -115,10 +115,10 @@ void on_1hz_timer(robot_event *ev){
   event.index=4;
   event.type = FLOAT;
   event.command = ROBOT_EVENT_VARIABLE;
-  event.f = readVolts(CELL_4);
+  event.f = readVolts(CELL_1);
   robot.sendEvent(&event);
   event.index=8;
-  event.f=readVolts(CELL_8);
+  event.f=readVolts(CELL_5);
   robot.sendEvent(&event);
 }
 

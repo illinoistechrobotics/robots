@@ -60,9 +60,11 @@ public class Queue {
 	}
 	
 	public synchronized boolean add(Event da){
+		/*
 		if(size >= max_size){
 			return false;
 		}
+		*/
 		Event newda = da.copy();
 		Node temp = new Node(newda);
 		size++;
