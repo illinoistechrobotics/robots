@@ -18,8 +18,8 @@
 
 
 struct encoder{
-  long count = 0;
-  unsigned long time = 0;
+  long count_t;
+  unsigned long time;
   int dir;
   int prev;
 };
@@ -29,6 +29,10 @@ volatile struct encoder encod1;
 volatile struct encoder encod2;
 
 void encoder_setup(){
+  encod1.count_t = 0;
+  encod2.count_t = 0;
+  encod1.time=millis();
+  encod2.time=millis();
   
   pinMode(ENCOD1_PINA, INPUT);
   pinMode(ENCOD1_PINB, INPUT);
@@ -51,8 +55,8 @@ void encoder_setup(){
   PCMSK0 = (1 << PCINT6) | (1 << PCINT7);  //PIN 12 and 13
   PCIFR |= (1 << PCIF0);
   
-  encod1.count = 0;
-  encod2.count = 0;
+  encod1.count_t = 0;
+  encod2.count_t = 0;
   
   encod1.prev = digitalRead(ENCOD1_PINA) << 1;
   encod1.prev |= digitalRead(ENCOD1_PINB);
@@ -84,9 +88,9 @@ ISR(PCINT2_vect) {
   encod1.prev = now;
   
   if(n_dir)
-    encod1.count--;
+    encod1.count_t--;
   else
-    encod1.count++;
+    encod1.count_t++;
   
   encod1.dir = n_dir;  
 }
@@ -104,19 +108,19 @@ ISR(PCINT0_vect) {
   encod2.prev = now;
   
   if(n_dir){
-      encod2.count--;
+      encod2.count_t--;
   }
   else{
-      encod2.count++; 
+      encod2.count_t++; 
   }
   
   encod2.dir = n_dir;
 }
 void zero_encod(struct encoder * encod){
-  encod->count=0;
+  encod->count_t=0;
 }
 int velocity(struct encoder * encod){
-  int velocity = encod->count/(millis()-encod->time);
+  int velocity = encod->count_t/(millis()-encod->time);
   zero_encod(encod);
   encod->time=millis();
   return velocity;
@@ -125,7 +129,7 @@ int velocity(struct encoder * encod){
 
 void print_encod(){
   Serial.println("A ");
-  Serial.println(encod1.count);
+  Serial.println(encod1.count_t);
   Serial.println("B ");
-  Serial.println(encod2.count);
+  Serial.println(encod2.count_t);
 }
