@@ -76,7 +76,7 @@ public class GUI extends Thread{
 	private JToggleButton btnGhostConnect;
 	private JToggleButton btnFenrirConnect;
 	public JButton btnGhostStatus;
-	public JButton btnFenrirStatus;
+	public JButton btnFenrirStatus= new JButton(":)");;
 	public Float[][] cells= new Float[2][9];
 	public Integer[] cellnames= {1,2,3,4,5,6,7,8};
 	public static JProgressBar battery1;
@@ -258,7 +258,8 @@ public class GUI extends Thread{
     					btnGhostStatus.setBackground(Color.GREEN);
     				}
     				if(ev.getIndex()==2){
-    					btnFenrirStatus.setBackground(Color.GREEN);
+    					//btnFenrirStatus.setBackground(Color.GREEN);
+    					System.out.println("GREEN");
     				}
     				
     				break;
@@ -415,7 +416,6 @@ public class GUI extends Thread{
 		btnFenrirConnect = new JToggleButton("Connect");
 		btnFenrirConnect.addActionListener(new btnStartListener());
 		
-		JButton btnFenrirStatus = new JButton(":)");
 		btnFenrirStatus.setBackground(Color.RED);
 		
 		table = new JTable(cells,cellnames);
